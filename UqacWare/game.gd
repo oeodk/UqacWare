@@ -1,15 +1,15 @@
 extends Node
 
-var mini_game_scenes: Array = []
-var available_games: Dictionary = {}
-var current_mod_folder : String = ""
+var _mini_game_scenes: Array = []
+var _available_games: Dictionary = {}
+var _current_mod_folder : String = ""
 
-var current_mini_game_instance : Node = null
-var current_mini_game : PackedScene # Returns a PackedScene
+var _current_mini_game_instance : Node = null
+var _current_mini_game : PackedScene # Returns a PackedScene
 
 var _mod_folder : String = ""
 
-var editions : Array = []
+var _edition : Array = []
 
 var _life : int = 3
 var _current_difficulty : UqacWareAPI.Difficulty = UqacWareAPI.Difficulty.EASY
@@ -23,8 +23,8 @@ func _init() -> void:
 	pass
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	editions = getFolderInUnpackedMod()
-	$MainMenu._initEditionLabel(editions)
+	_edition = getFolderInUnpackedMod()
+	$MainMenu._initEditionLabel(_edition)
 	$MainMenu.showMenu()
 	$WinScreen.hide()
 	$GameOverSceeen.hide()
@@ -39,7 +39,7 @@ func _process(delta: float) -> void:
 func startGame() -> void:
 	_mod_folder = $MainMenu._edition_selected
 	if _mod_folder == "":
-		for folder in editions:
+		for folder in _edition:
 			loadGames(folder)
 	else:
 		loadGames(_mod_folder)
@@ -63,26 +63,26 @@ func _on_main_menu_start_game() -> void:
 	pass # Replace with function body.
 
 func loadGames(mods_dir : String) ->void:
-	current_mod_folder = mods_dir
-	if not available_games.has(current_mod_folder):
-		available_games[current_mod_folder] = []
+	_current_mod_folder = mods_dir
+	if not _available_games.has(_current_mod_folder):
+		_available_games[_current_mod_folder] = []
 		var mods_path = "res://mods-unpacked/" + mods_dir
 		ModLoaderStore.unpacked_dir = mods_path
 		ModLoader.load_mods()
 	pass
 
 func _initAvailableGame(edition : String) ->void:
-	mini_game_scenes.clear()
+	_mini_game_scenes.clear()
 	if edition == "":
-		for selected_edition in available_games:
-			mini_game_scenes.append_array(available_games[selected_edition])
+		for selected_edition in _available_games:
+			_mini_game_scenes.append_array(_available_games[selected_edition])
 	else:
-		mini_game_scenes.append_array(available_games[edition])
+		_mini_game_scenes.append_array(_available_games[edition])
 
 	pass
 
 func addGame(scene_path : String) -> void:
-	available_games[current_mod_folder].append(scene_path)
+	_available_games[_current_mod_folder].append(scene_path)
 	pass
  
 func miniGameEnded(result : bool) -> void:
@@ -115,19 +115,19 @@ func miniGameEnded(result : bool) -> void:
 	pass
 
 func resetCurrentGame()->void:
-	if current_mini_game_instance != null:
-		current_mini_game_instance.queue_free()
-		remove_child(current_mini_game_instance)
-		current_mini_game_instance = null
+	if _current_mini_game_instance != null:
+		_current_mini_game_instance.queue_free()
+		remove_child(_current_mini_game_instance)
+		_current_mini_game_instance = null
 
 func startRandomGame() -> void:
 	
-	var random_index = randi() % mini_game_scenes.size()
-	current_mini_game = load(mini_game_scenes[random_index]) 
-	current_mini_game_instance = current_mini_game.instantiate()
-	add_child(current_mini_game_instance)
-	current_mini_game_instance.set_process(true)
-	current_mini_game_instance.startGame(_current_difficulty)
+	var random_index = randi() % _mini_game_scenes.size()
+	_current_mini_game = load(_mini_game_scenes[random_index]) 
+	_current_mini_game_instance = _current_mini_game.instantiate()
+	add_child(_current_mini_game_instance)
+	_current_mini_game_instance.set_process(true)
+	_current_mini_game_instance.startGame(_current_difficulty)
 	pass
 
 func win() -> void:

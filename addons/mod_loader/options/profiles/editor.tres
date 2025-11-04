@@ -1,0 +1,7 @@
+[gd_resource type="Resource" script_class="ModLoaderOptionsProfile" load_steps=2 format=3 uid="uid://cw56q8a1wii6p"]
+
+[ext_resource type="Script" uid="uid://dnb4yllikxh58" path="res://addons/mod_loader/resources/options_profile.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+ignore_deprecated_errors = true

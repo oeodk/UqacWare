@@ -1,0 +1,25 @@
+[gd_scene load_steps=2 format=3 uid="uid://djkxakfae6rcr"]
+
+[ext_resource type="Script" uid="uid://h8rbh0tb1c2o" path="res://mods-unpacked/Demo2/Test-RightLeft/GameFiles/main_scene.gd" id="1_4o382"]
+
+[node name="DemoScene" type="Node"]
+script = ExtResource("1_4o382")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="Label" type="Label" parent="CanvasLayer"]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -33.5
+offset_top = -11.5
+offset_right = 33.5
+offset_bottom = 11.5
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 100
+text = "Press Right to win
+Press Left to lose"
+horizontal_alignment = 1

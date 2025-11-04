@@ -1,0 +1,7 @@
+[gd_resource type="Resource" script_class="ModLoaderOptionsProfile" load_steps=2 format=3 uid="uid://dtrsb7smtvba1"]
+
+[ext_resource type="Script" uid="uid://dnb4yllikxh58" path="res://addons/mod_loader/resources/options_profile.gd" id="1_7g0sr"]
+
+[resource]
+script = ExtResource("1_7g0sr")
+enable_mods = false

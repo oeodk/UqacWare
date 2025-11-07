@@ -23,3 +23,7 @@ theme_override_font_sizes/font_size = 100
 text = "Press Up to win
 Press Down to lose"
 horizontal_alignment = 1
+
+[node name="Timer" type="Timer" parent="."]
+
+[connection signal="timeout" from="Timer" to="." method="_on_timer_timeout"]

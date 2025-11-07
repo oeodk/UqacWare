@@ -13,4 +13,4 @@ func _init() -> void:
 
 func register_scene() -> void:
 	var scene_path = mod_dir_path.path_join("GameFiles/main_scene.tscn")
-	UqacWareAPI.addGame(scene_path)
+	UqacWareAPI._addGame(scene_path)

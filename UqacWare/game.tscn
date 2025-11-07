@@ -1,10 +1,11 @@
-[gd_scene load_steps=6 format=3 uid="uid://dlf83vqtmhqo5"]
+[gd_scene load_steps=7 format=3 uid="uid://dlf83vqtmhqo5"]
 
 [ext_resource type="Script" uid="uid://o18qx10g8n6r" path="res://UqacWare/game.gd" id="1_nlbyh"]
 [ext_resource type="PackedScene" uid="uid://c71c0ue4yw6yu" path="res://UqacWare/Ui/main_menu.tscn" id="2_6dk5d"]
 [ext_resource type="PackedScene" uid="uid://vv46bnjjvxyq" path="res://UqacWare/Ui/win_screen.tscn" id="3_6ukn4"]
 [ext_resource type="PackedScene" uid="uid://d3sbs1gjkx6p1" path="res://UqacWare/Ui/game_over_screen.tscn" id="4_k5ftu"]
 [ext_resource type="PackedScene" uid="uid://d1xp2124osgpd" path="res://UqacWare/Ui/transition_screen.tscn" id="5_k5ftu"]
+[ext_resource type="PackedScene" uid="uid://dkifl8nk0oayt" path="res://UqacWare/Ui/game_overlay.tscn" id="6_hc4j8"]
 
 [node name="Game" type="Node"]
 script = ExtResource("1_nlbyh")
@@ -17,8 +18,14 @@ script = ExtResource("1_nlbyh")
 
 [node name="TransitionScreen" parent="." instance=ExtResource("5_k5ftu")]
 
+[node name="GameOverlay" parent="." instance=ExtResource("6_hc4j8")]
+
+[node name="MiniGameTimer" type="Timer" parent="."]
+one_shot = true
+
 [connection signal="quit" from="MainMenu" to="." method="_on_main_menu_quit"]
 [connection signal="start_game" from="MainMenu" to="." method="_on_main_menu_start_game"]
 [connection signal="return_to_main_menu" from="WinScreen" to="." method="_on_win_screen_return_to_main_menu"]
 [connection signal="return_to_main_menu" from="GameOverSceeen" to="." method="_on_game_over_sceeen_return_to_main_menu"]
 [connection signal="transition_ended" from="TransitionScreen" to="." method="_on_transition_screen_transition_ended"]
+[connection signal="timeout" from="MiniGameTimer" to="." method="_on_mini_game_timer_timeout"]

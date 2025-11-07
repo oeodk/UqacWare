@@ -15,9 +15,11 @@ var _life : int = 3
 var _current_difficulty : UqacWareAPI.Difficulty = UqacWareAPI.Difficulty.EASY
 var _game_won : int = 0
 
-const _normal_difficulty_threshold : int = 10
-const _hard_difficulty_threshold : int = 20
-const _win_threshold : int = 30
+var _mini_game_duration : int = 0
+
+const _normal_difficulty_threshold : int = 5
+const _hard_difficulty_threshold : int = 10
+const _win_threshold : int = 15
 
 func _init() -> void:
 	pass
@@ -25,10 +27,7 @@ func _init() -> void:
 func _ready() -> void:
 	_edition = getFolderInUnpackedMod()
 	$MainMenu._initEditionLabel(_edition)
-	$MainMenu.showMenu()
-	$WinScreen.hide()
-	$GameOverSceeen.hide()
-	$TransitionScreen.hide()
+	_resetGame()
 	pass # Replace with function body.
 
 
@@ -85,14 +84,16 @@ func addGame(scene_path : String) -> void:
 	_available_games[_current_mod_folder].append(scene_path)
 	pass
  
-func miniGameEnded(result : bool) -> void:
-	if result :
-		_game_won = _game_won + 1
-		$TransitionScreen._updateScore(_game_won)
-	else:
-		_life = _life - 1
-		$TransitionScreen._updateLife(_life)
-		
+func _miniGameEnded(end_state : UqacWareAPI.MiniGameEndState) -> void:
+	$MiniGameTimer.stop()
+	match end_state:
+		UqacWareAPI.MiniGameEndState.WIN:
+			_game_won = _game_won + 1
+			$TransitionScreen._updateScore(_game_won)
+		UqacWareAPI.MiniGameEndState.LOSS:
+			_life = _life - 1
+			$TransitionScreen._updateLife(_life)
+
 	if _life == 0:
 		resetCurrentGame()
 		gameOver()
@@ -119,6 +120,7 @@ func resetCurrentGame()->void:
 		_current_mini_game_instance.queue_free()
 		remove_child(_current_mini_game_instance)
 		_current_mini_game_instance = null
+	$GameOverlay.hideOverlay()
 
 func startRandomGame() -> void:
 	
@@ -128,6 +130,9 @@ func startRandomGame() -> void:
 	add_child(_current_mini_game_instance)
 	_current_mini_game_instance.set_process(true)
 	_current_mini_game_instance.startGame(_current_difficulty)
+	
+	$GameOverlay.showOverlay(_mini_game_duration)
+	$MiniGameTimer.start()
 	pass
 
 func win() -> void:
@@ -172,13 +177,27 @@ func _resetGame() ->void:
 	$WinScreen.hide()
 	$GameOverSceeen.hide()
 	$MainMenu.showMenu()
+	$GameOverlay.hideOverlay()
 	_life = 3
 	_current_difficulty = UqacWareAPI.Difficulty.EASY
 	_game_won = 0
-	
+	_mini_game_duration = 0
 	pass
 
+func _initializeMiniGameTimeout(seconds : int) -> void:
+	$MiniGameTimer.wait_time = seconds + 1
+	_mini_game_duration = seconds
+	pass
+
+func _initOverlay() -> void:
+	$SecondsTimer.start()
+	pass
 
 func _on_transition_screen_transition_ended() -> void:
 	startRandomGame()
+	pass # Replace with function body.
+
+
+func _on_mini_game_timer_timeout() -> void:
+	_miniGameEnded(UqacWareAPI.MiniGameEndState.ERROR)
 	pass # Replace with function body.

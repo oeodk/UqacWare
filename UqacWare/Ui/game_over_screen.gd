@@ -19,3 +19,6 @@ func _on_button_pressed() -> void:
 func showMenu() -> void:
 	$Button.grab_focus()
 	show()
+
+func setScore(score : int) -> void:
+	$Score.text = "Score : " + str(score)

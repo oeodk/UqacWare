@@ -5,24 +5,25 @@
 [node name="MainMenu" type="CanvasLayer"]
 script = ExtResource("1_byfuh")
 
-[node name="Start" type="Button" parent="."]
+[node name="StartAllGame" type="Button" parent="."]
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = 78.5
-offset_top = -172.5
-offset_right = 321.5
-offset_bottom = -27.5
+offset_left = 25.0
+offset_top = 27.5
+offset_right = 775.0
+offset_bottom = 172.5
 grow_horizontal = 2
 grow_vertical = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
 focus_neighbor_left = NodePath("../EditionSelection")
+focus_neighbor_top = NodePath("../StartInfinite")
 focus_neighbor_bottom = NodePath("../Quit")
 theme_override_font_sizes/font_size = 100
-text = "Start"
+text = "Start All Ga	mes"
 
 [node name="Quit" type="Button" parent="."]
 anchors_preset = 8
@@ -30,14 +31,16 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = 91.5
-offset_top = 27.5
-offset_right = 308.5
-offset_bottom = 172.5
+offset_left = 25.0
+offset_top = 227.5
+offset_right = 242.0
+offset_bottom = 372.5
 grow_horizontal = 2
 grow_vertical = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
 focus_neighbor_left = NodePath("../EditionSelection")
-focus_neighbor_top = NodePath("../Start")
+focus_neighbor_top = NodePath("../StartAllGame")
 theme_override_font_sizes/font_size = 100
 text = "Quit"
 
@@ -50,8 +53,9 @@ offset_top = 27.5
 offset_right = 802.0
 offset_bottom = 177.5
 grow_vertical = 2
-focus_neighbor_right = NodePath("../Start")
+focus_neighbor_right = NodePath("../StartAllGame")
 theme_override_font_sizes/font_size = 100
+allow_reselect = true
 
 [node name="EditionLabel" type="Label" parent="."]
 anchors_preset = 4
@@ -64,6 +68,17 @@ grow_vertical = 2
 theme_override_font_sizes/font_size = 100
 text = "Edition selection"
 
-[connection signal="pressed" from="Start" to="." method="_on_start_pressed"]
+[node name="StartInfinite" type="Button" parent="."]
+offset_left = 985.0
+offset_top = 367.5
+offset_right = 1600.0
+offset_bottom = 512.5
+focus_neighbor_left = NodePath("../EditionSelection")
+focus_neighbor_bottom = NodePath("../StartAllGame")
+theme_override_font_sizes/font_size = 100
+text = "Start Infinite"
+
+[connection signal="pressed" from="StartAllGame" to="." method="_on_start_all_game_pressed"]
 [connection signal="pressed" from="Quit" to="." method="_on_quit_pressed"]
 [connection signal="item_selected" from="EditionSelection" to="." method="_on_edition_selection_item_selected"]
+[connection signal="pressed" from="StartInfinite" to="." method="_on_start_infinite_pressed"]

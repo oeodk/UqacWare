@@ -5,21 +5,27 @@ var _available_games: Dictionary = {}
 var _current_mod_folder : String = ""
 
 var _current_mini_game_instance : Node = null
-var _current_mini_game : PackedScene # Returns a PackedScene
+var _current_mini_game : PackedScene
 
 var _mod_folder : String = ""
 
 var _edition : Array = []
 
-var _life : int = 3
+const _base_life : int = 3
+var _life : int = _base_life
 var _current_difficulty : UqacWareAPI.Difficulty = UqacWareAPI.Difficulty.EASY
 var _game_won : int = 0
 
 var _mini_game_duration : int = 0
 
-const _normal_difficulty_threshold : int = 5
-const _hard_difficulty_threshold : int = 10
-const _win_threshold : int = 15
+const _dificulty_step : int = 5
+var _mini_game_finished : int = 0
+
+var _normal_difficulty_threshold : int = 5
+var _hard_difficulty_threshold : int = 10
+var _win_threshold : int = 15
+
+var _gamemode : UqacWareAPI.GameMode = UqacWareAPI.GameMode.INFINITE
 
 func _init() -> void:
 	pass
@@ -57,7 +63,8 @@ func _on_main_menu_quit() -> void:
 	pass # Replace with function body.
 
 
-func _on_main_menu_start_game() -> void:
+func _on_main_menu_start_game(gamemode : UqacWareAPI.GameMode) -> void:
+	_gamemode = gamemode
 	startGame()
 	pass # Replace with function body.
 
@@ -78,6 +85,16 @@ func _initAvailableGame(edition : String) ->void:
 	else:
 		_mini_game_scenes.append_array(_available_games[edition])
 
+	match _gamemode:
+		UqacWareAPI.GameMode.INFINITE:
+			_normal_difficulty_threshold = _dificulty_step
+			_hard_difficulty_threshold = _dificulty_step * 2
+			_win_threshold = _dificulty_step * 3
+		UqacWareAPI.GameMode.ALL_GAMES:
+			var step : int = _mini_game_scenes.size() / 3
+			_normal_difficulty_threshold = step
+			_hard_difficulty_threshold = step * 2
+			_win_threshold = _mini_game_scenes.size() 
 	pass
 
 func addGame(scene_path : String) -> void:
@@ -85,6 +102,8 @@ func addGame(scene_path : String) -> void:
 	pass
  
 func _miniGameEnded(end_state : UqacWareAPI.MiniGameEndState) -> void:
+	_mini_game_finished += 1
+
 	$MiniGameTimer.stop()
 	match end_state:
 		UqacWareAPI.MiniGameEndState.WIN:
@@ -93,16 +112,17 @@ func _miniGameEnded(end_state : UqacWareAPI.MiniGameEndState) -> void:
 		UqacWareAPI.MiniGameEndState.LOSS:
 			_life = _life - 1
 			$TransitionScreen._updateLife(_life)
-
-	if _life == 0:
+	
+	if _life <= 0:
 		resetCurrentGame()
 		gameOver()
 		return
-		
-	if _game_won >= _win_threshold:
-		resetCurrentGame()
-		win()
-		return
+	
+	if _gamemode == UqacWareAPI.GameMode.ALL_GAMES:
+		if _mini_game_finished >= _win_threshold:
+			resetCurrentGame()
+			win()
+			return
 	
 	if _current_difficulty == UqacWareAPI.Difficulty.EASY and _game_won >= _normal_difficulty_threshold:
 		_current_difficulty = UqacWareAPI.Difficulty.NORMAL
@@ -131,15 +151,20 @@ func startRandomGame() -> void:
 	_current_mini_game_instance.set_process(true)
 	_current_mini_game_instance.startGame(_current_difficulty)
 	
+	if _gamemode == UqacWareAPI.GameMode.ALL_GAMES:
+		_mini_game_scenes.erase(_mini_game_scenes[random_index])
+	
 	$GameOverlay.showOverlay(_mini_game_duration)
 	$MiniGameTimer.start()
 	pass
 
 func win() -> void:
+	$WinScreen.setScore(_game_won)
 	$WinScreen.showMenu()
 	pass
 
 func gameOver() -> void:
+	$GameOverSceeen.setScore(_game_won)
 	$GameOverSceeen.showMenu()
 	pass
 
@@ -178,10 +203,13 @@ func _resetGame() ->void:
 	$GameOverSceeen.hide()
 	$MainMenu.showMenu()
 	$GameOverlay.hideOverlay()
-	_life = 3
+	$TransitionScreen._updateScore(0)
+	$TransitionScreen._updateLife(_base_life)
+	_life = _base_life
 	_current_difficulty = UqacWareAPI.Difficulty.EASY
 	_game_won = 0
 	_mini_game_duration = 0
+	_mini_game_finished = 0
 	pass
 
 func _initializeMiniGameTimeout(seconds : int) -> void:

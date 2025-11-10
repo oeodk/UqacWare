@@ -36,7 +36,6 @@ func _ready() -> void:
 	_resetGame()
 	pass # Replace with function body.
 
-
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
 	pass
@@ -56,17 +55,6 @@ func startGame() -> void:
 func quit() -> void:
 	get_tree().quit()
 	pass
-
-
-func _on_main_menu_quit() -> void:
-	quit()
-	pass # Replace with function body.
-
-
-func _on_main_menu_start_game(gamemode : UqacWareAPI.GameMode) -> void:
-	_gamemode = gamemode
-	startGame()
-	pass # Replace with function body.
 
 func loadGames(mods_dir : String) ->void:
 	_current_mod_folder = mods_dir
@@ -168,11 +156,6 @@ func gameOver() -> void:
 	$GameOverSceeen.showMenu()
 	pass
 
-func _startTransition()->void:
-	resetCurrentGame()
-	$TransitionScreen._startTransition()
-	pass
-
 func getFolderInUnpackedMod() -> Array:
 	var path : String = ProjectSettings.globalize_path("res://") + "mods-unpacked"
 	var folders: Array = []
@@ -188,16 +171,6 @@ func getFolderInUnpackedMod() -> Array:
 		dir.list_dir_end()    
 	return folders
 
-
-func _on_game_over_sceeen_return_to_main_menu() -> void:
-	_resetGame()
-	pass # Replace with function body.
-
-
-func _on_win_screen_return_to_main_menu() -> void:
-	_resetGame()
-	pass # Replace with function body.
-
 func _resetGame() ->void:
 	$WinScreen.hide()
 	$GameOverSceeen.hide()
@@ -212,6 +185,11 @@ func _resetGame() ->void:
 	_mini_game_finished = 0
 	pass
 
+func _startTransition()->void:
+	resetCurrentGame()
+	$TransitionScreen._startTransition()
+	pass
+
 func _initializeMiniGameTimeout(seconds : int) -> void:
 	$MiniGameTimer.wait_time = seconds + 1
 	_mini_game_duration = seconds
@@ -220,6 +198,26 @@ func _initializeMiniGameTimeout(seconds : int) -> void:
 func _initOverlay() -> void:
 	$SecondsTimer.start()
 	pass
+
+func _on_game_over_sceeen_return_to_main_menu() -> void:
+	_resetGame()
+	pass # Replace with function body.
+
+
+func _on_win_screen_return_to_main_menu() -> void:
+	_resetGame()
+	pass # Replace with function body.
+
+
+func _on_main_menu_quit() -> void:
+	quit()
+	pass # Replace with function body.
+
+func _on_main_menu_start_game(gamemode : UqacWareAPI.GameMode) -> void:
+	_gamemode = gamemode
+	startGame()
+	pass # Replace with function body.
+
 
 func _on_transition_screen_transition_ended() -> void:
 	startRandomGame()

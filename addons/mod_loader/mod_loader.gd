@@ -67,6 +67,10 @@ func _init_mod(mod: ModData) -> void:
 
 	var mod_main_instance: Node = mod_main_script.new()
 	mod_main_instance.name = mod.manifest.get_mod_id()
+	
+	#scene initialization
+	var splits = mod_main_path.split("/")
+	mod_main_instance.call("register_scene", splits[splits.size() - 2])
 
 	ModLoaderStore.saved_mod_mains[mod_main_path] = mod_main_instance
 

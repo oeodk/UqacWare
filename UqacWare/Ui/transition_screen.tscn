@@ -44,7 +44,7 @@ grow_horizontal = 2
 theme_override_font_sizes/font_size = 100
 text = "Score : 0"
 
-[node name="SpeedLabel" type="Label" parent="."]
+[node name="InfoLabel" type="Label" parent="."]
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5

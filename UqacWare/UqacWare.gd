@@ -20,9 +20,9 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	pass
 
-func _addGame(path : String) -> void:
+func _addGame(path : String, boss : bool) -> void:
 	var main_scene = get_tree().current_scene
-	main_scene.call("addGame", path)
+	main_scene.call("addGame", path, boss)
 
 func miniGameEnded(end_state :  MiniGameEndState) -> void:
 	var main_scene = get_tree().current_scene

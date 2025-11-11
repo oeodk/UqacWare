@@ -4,7 +4,7 @@ var _mod_dir := ""
 var _mod_dir_path := ""
 
 # Modifier à true si le niveau est un boss
-var boss_game : bool = false
+var boss_game : bool = true
 
 func _init() -> void:
 	pass

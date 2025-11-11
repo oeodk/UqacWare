@@ -1,7 +1,10 @@
 extends Node
 
 var _mini_game_scenes: Array = []
+var _boss_game_scenes: Array = []
+
 var _available_games: Dictionary = {}
+var _available_boss_games : Dictionary = {}
 var _current_mod_folder : String = ""
 
 var _current_mini_game_instance : Node = null
@@ -26,6 +29,7 @@ var _hard_difficulty_threshold : int = 10
 var _win_threshold : int = 15
 
 var _gamemode : UqacWareAPI.GameMode = UqacWareAPI.GameMode.INFINITE
+var _boss_battle : bool = false
 
 func _init() -> void:
 	pass
@@ -60,6 +64,7 @@ func loadGames(mods_dir : String) ->void:
 	_current_mod_folder = mods_dir
 	if not _available_games.has(_current_mod_folder):
 		_available_games[_current_mod_folder] = []
+		_available_boss_games[_current_mod_folder] = []
 		var mods_path = "res://mods-unpacked/" + mods_dir
 		ModLoaderStore.unpacked_dir = mods_path
 		ModLoader.load_mods()
@@ -70,8 +75,10 @@ func _initAvailableGame(edition : String) ->void:
 	if edition == "":
 		for selected_edition in _available_games:
 			_mini_game_scenes.append_array(_available_games[selected_edition])
+			_boss_game_scenes.append_array(_available_boss_games[selected_edition])
 	else:
 		_mini_game_scenes.append_array(_available_games[edition])
+		_boss_game_scenes.append_array(_available_boss_games[edition])
 
 	match _gamemode:
 		UqacWareAPI.GameMode.INFINITE:
@@ -79,14 +86,17 @@ func _initAvailableGame(edition : String) ->void:
 			_hard_difficulty_threshold = _dificulty_step * 2
 			_win_threshold = _dificulty_step * 3
 		UqacWareAPI.GameMode.ALL_GAMES:
-			var step : int = _mini_game_scenes.size() / 3
+			var step : int = (_mini_game_scenes.size()  + _boss_game_scenes.size()) / 3
 			_normal_difficulty_threshold = step
 			_hard_difficulty_threshold = step * 2
-			_win_threshold = _mini_game_scenes.size() 
+			_win_threshold = _mini_game_scenes.size() + _boss_game_scenes.size()
 	pass
 
-func addGame(scene_path : String) -> void:
-	_available_games[_current_mod_folder].append(scene_path)
+func addGame(scene_path : String, boss : bool) -> void:
+	if boss:
+		_available_boss_games[_current_mod_folder].append(scene_path)
+	else:
+		_available_games[_current_mod_folder].append(scene_path)
 	pass
  
 func _miniGameEnded(end_state : UqacWareAPI.MiniGameEndState) -> void:
@@ -112,16 +122,33 @@ func _miniGameEnded(end_state : UqacWareAPI.MiniGameEndState) -> void:
 			win()
 			return
 	
-	if _current_difficulty == UqacWareAPI.Difficulty.EASY and _game_won >= _normal_difficulty_threshold:
-		_current_difficulty = UqacWareAPI.Difficulty.NORMAL
-		$TransitionScreen._faster()
-		
-	if _current_difficulty == UqacWareAPI.Difficulty.NORMAL and _game_won >= _hard_difficulty_threshold:
-		_current_difficulty = UqacWareAPI.Difficulty.HARD
-		$TransitionScreen._faster()
+	if _boss_battle or _boss_game_scenes.size() == 0:
+		if _current_difficulty == UqacWareAPI.Difficulty.EASY and _game_won >= _normal_difficulty_threshold:
+			_changeDifficultyTo(UqacWareAPI.Difficulty.NORMAL)
+			
+		if _current_difficulty == UqacWareAPI.Difficulty.NORMAL and _game_won >= _hard_difficulty_threshold:
+			_changeDifficultyTo(UqacWareAPI.Difficulty.HARD)
+		_boss_battle = false
+	else:
+		if _current_difficulty == UqacWareAPI.Difficulty.EASY and _game_won >= _normal_difficulty_threshold:
+			_enableBossBattle()
+			
+		if _current_difficulty == UqacWareAPI.Difficulty.NORMAL and _game_won >= _hard_difficulty_threshold:
+			_enableBossBattle()
 		
 	_startTransition()
 	pass
+
+func _changeDifficultyTo(difficulty : UqacWareAPI.Difficulty) -> void:
+	_current_difficulty = difficulty
+	$TransitionScreen._faster()
+	pass
+
+func _enableBossBattle() -> void:
+	_boss_battle = true
+	if _boss_game_scenes.size() > 0:
+		$TransitionScreen.anounceBoss()
+
 
 func resetCurrentGame()->void:
 	if _current_mini_game_instance != null:
@@ -132,15 +159,22 @@ func resetCurrentGame()->void:
 
 func startRandomGame() -> void:
 	
-	var random_index = randi() % _mini_game_scenes.size()
-	_current_mini_game = load(_mini_game_scenes[random_index]) 
+	var random_index : int
+	if _boss_battle && _boss_game_scenes.size() > 0 :
+		random_index = randi() % _boss_game_scenes.size()
+		_current_mini_game = load(_boss_game_scenes[random_index]) 
+		if _gamemode == UqacWareAPI.GameMode.ALL_GAMES:
+			_boss_game_scenes.erase(_boss_game_scenes[random_index])
+	else:
+		random_index = randi() % _mini_game_scenes.size()
+		_current_mini_game = load(_mini_game_scenes[random_index]) 
+		if _gamemode == UqacWareAPI.GameMode.ALL_GAMES:
+			_mini_game_scenes.erase(_mini_game_scenes[random_index])
+		
 	_current_mini_game_instance = _current_mini_game.instantiate()
 	add_child(_current_mini_game_instance)
 	_current_mini_game_instance.set_process(true)
 	_current_mini_game_instance.startGame(_current_difficulty)
-	
-	if _gamemode == UqacWareAPI.GameMode.ALL_GAMES:
-		_mini_game_scenes.erase(_mini_game_scenes[random_index])
 	
 	$GameOverlay.showOverlay(_mini_game_duration)
 	$MiniGameTimer.start()

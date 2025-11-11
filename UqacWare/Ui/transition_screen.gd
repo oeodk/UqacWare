@@ -30,7 +30,7 @@ func _on_timer_timeout() -> void:
 		$Timer.stop()
 		_countdown = COUNT_MAX
 		transition_ended.emit()
-		$SpeedLabel.text = ""
+		$InfoLabel.text = ""
 		hide()
 	pass # Replace with function body.
 
@@ -41,4 +41,7 @@ func _updateScore(score : int) -> void:
 	$Score.text = "Score : " + str(score)
 
 func _faster() -> void:
-	$SpeedLabel.text = "Faster"
+	$InfoLabel.text = "Faster"
+	
+func anounceBoss() -> void:
+	$InfoLabel.text = "Boss"

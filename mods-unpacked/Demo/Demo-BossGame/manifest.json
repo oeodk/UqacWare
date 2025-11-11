@@ -1,4 +1,9 @@
 {
+	"name": "BossGame",
+	"namespace": "Demo",
+	"website_url": "https://github.com/exampleauthor/examplemod",
+
+	"version_number": "0.0.1",
 	"dependencies": [],
 	"description": "Description of your mod...",
 	"extra": {
@@ -22,9 +27,5 @@
 			"optional_dependencies": [],
 			"tags": []
 		}
-	},
-	"name": "BossGame",
-	"namespace": "Demo",
-	"version_number": "0.0.1",
-	"website_url": "https://github.com/exampleauthor/examplemod"
+	}
 }

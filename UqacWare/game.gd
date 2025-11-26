@@ -16,17 +16,15 @@ var _edition : Array = []
 
 const _base_life : int = 3
 var _life : int = _base_life
-var _current_difficulty : UqacWareAPI.Difficulty = UqacWareAPI.Difficulty.EASY
-var _game_won : int = 0
 
 var _mini_game_duration : int = 0
 
-const _dificulty_step : int = 5
-var _mini_game_finished : int = 0
-
-var _normal_difficulty_threshold : int = 5
-var _hard_difficulty_threshold : int = 10
-var _win_threshold : int = 15
+var _current_difficulty : int = 1
+const DEFAULT_DIFFICULTY_STEP : int = 10
+const DIFFICULTY_INCREASE_STEP : int = 1
+var _dificulty_step : int = DEFAULT_DIFFICULTY_STEP
+var _game_won : int = 0
+var _game_cleared_in_current_difficulty : int = 0
 
 var _gamemode : UqacWareAPI.GameMode = UqacWareAPI.GameMode.INFINITE
 var _boss_battle : bool = false
@@ -82,14 +80,9 @@ func _initAvailableGame(edition : String) ->void:
 
 	match _gamemode:
 		UqacWareAPI.GameMode.INFINITE:
-			_normal_difficulty_threshold = _dificulty_step
-			_hard_difficulty_threshold = _dificulty_step * 2
-			_win_threshold = _dificulty_step * 3
+			_dificulty_step = DEFAULT_DIFFICULTY_STEP
 		UqacWareAPI.GameMode.ALL_GAMES:
-			var step : int = (_mini_game_scenes.size()  + _boss_game_scenes.size()) / 3
-			_normal_difficulty_threshold = step
-			_hard_difficulty_threshold = step * 2
-			_win_threshold = _mini_game_scenes.size() + _boss_game_scenes.size()
+			_dificulty_step = _mini_game_scenes.size()  / _boss_game_scenes.size()
 	pass
 
 func addGame(scene_path : String, boss : bool) -> void:
@@ -100,8 +93,6 @@ func addGame(scene_path : String, boss : bool) -> void:
 	pass
  
 func _miniGameEnded(end_state : UqacWareAPI.MiniGameEndState) -> void:
-	_mini_game_finished += 1
-
 	$MiniGameTimer.stop()
 	match end_state:
 		UqacWareAPI.MiniGameEndState.WIN:
@@ -117,30 +108,24 @@ func _miniGameEnded(end_state : UqacWareAPI.MiniGameEndState) -> void:
 		return
 	
 	if _gamemode == UqacWareAPI.GameMode.ALL_GAMES:
-		if _mini_game_finished >= _win_threshold:
+		if _mini_game_scenes.is_empty() && _boss_game_scenes.is_empty():
 			resetCurrentGame()
 			win()
 			return
 	
-	if _boss_battle or _boss_game_scenes.size() == 0:
-		if _current_difficulty == UqacWareAPI.Difficulty.EASY and _game_won >= _normal_difficulty_threshold:
-			_changeDifficultyTo(UqacWareAPI.Difficulty.NORMAL)
-			
-		if _current_difficulty == UqacWareAPI.Difficulty.NORMAL and _game_won >= _hard_difficulty_threshold:
-			_changeDifficultyTo(UqacWareAPI.Difficulty.HARD)
+	if _boss_battle:
+		_increaseDifficulty()
 		_boss_battle = false
 	else:
-		if _current_difficulty == UqacWareAPI.Difficulty.EASY and _game_won >= _normal_difficulty_threshold:
-			_enableBossBattle()
-			
-		if _current_difficulty == UqacWareAPI.Difficulty.NORMAL and _game_won >= _hard_difficulty_threshold:
-			_enableBossBattle()
-		
+		_game_cleared_in_current_difficulty += 1
+		if _game_cleared_in_current_difficulty == _dificulty_step:
+			_enableBossBattle()		
 	_startTransition()
 	pass
 
-func _changeDifficultyTo(difficulty : UqacWareAPI.Difficulty) -> void:
-	_current_difficulty = difficulty
+func _increaseDifficulty() -> void:
+	_current_difficulty += DIFFICULTY_INCREASE_STEP
+	_game_cleared_in_current_difficulty = 0
 	$TransitionScreen._faster()
 	pass
 
@@ -216,7 +201,8 @@ func _resetGame() ->void:
 	_current_difficulty = UqacWareAPI.Difficulty.EASY
 	_game_won = 0
 	_mini_game_duration = 0
-	_mini_game_finished = 0
+	_game_cleared_in_current_difficulty = 0
+	_boss_battle = false
 	pass
 
 func _startTransition()->void:

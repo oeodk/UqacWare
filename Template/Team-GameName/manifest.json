@@ -1,6 +1,7 @@
 {
 	"name": "GameName",
 	"namespace": "Team",
+	
 	"website_url": "https://github.com/exampleauthor/examplemod",
 	
 	"version_number": "0.0.1",

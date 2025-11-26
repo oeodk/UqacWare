@@ -6,11 +6,8 @@ func _ready() -> void:
 
 # Fonction appelée par le jeu principal
 # difficulty : la difficulté atuelle du jeu
-# Entrées possible : 
-#	UqacWareAPI.Difficulty.EASY
-#	UqacWareAPI.Difficulty.NORMAL
-#	UqacWareAPI.Difficulty.HARD
-func startGame(difficulty : UqacWareAPI.Difficulty) -> void:
+# La difficulté débute à 1 et augmente de 1 par niveau
+func startGame(difficulty : int) -> void:
 	pass
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.

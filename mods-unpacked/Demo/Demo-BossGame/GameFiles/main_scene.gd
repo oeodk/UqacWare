@@ -20,17 +20,10 @@ func _process(delta: float) -> void:
 #	UqacWareAPI.Difficulty.EASY
 #	UqacWareAPI.Difficulty.NORMAL
 #	UqacWareAPI.Difficulty.HARD
-func startGame(difficulty : UqacWareAPI.Difficulty) -> void:
-	match difficulty:
-		UqacWareAPI.Difficulty.EASY:
-			initializeGameTimeout(3)
-			$Timer.wait_time = 3
-		UqacWareAPI.Difficulty.NORMAL:
-			initializeGameTimeout(2)
-			$Timer.wait_time = 2
-		UqacWareAPI.Difficulty.HARD:
-			initializeGameTimeout(1)
-			$Timer.wait_time = 1
+func startGame(difficulty : int) -> void:
+	var time : int = max(1,4-difficulty)
+	initializeGameTimeout(time)
+	$Timer.wait_time = time
 	$Timer.start()
 	pass
 	
